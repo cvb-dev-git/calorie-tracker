@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Deficit Planner</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Tailwind Configuration for native iOS looks
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        iosBg: '#000000',
+                        iosCard: '#1C1C1E',
+                        iosActive: '#30D158', // iOS green for action/burn
+                        iosAlert: '#FF3B30', // iOS red for consumption
+                        iosNeutral: '#3A3A3C',
+                        iosText: '#FFFFFF',
+                        iosSubText: '#8E8E93',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Force iOS native app behavior */
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        /* Custom styling for sleek iOS toggles */
+        input[type="checkbox"]:checked {
+            background-color: #30D158;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6 lg:p-8">
+
+    <div class="max-w-md mx-auto space-y-6">
+
+        <!-- HEADER -->
+        <header class="flex justify-between items-center pb-2 border-b border-iosNeutral">
+            <h1 class="text-3xl font-bold tracking-tight">Deficit Agent</h1>
+            <div id="currentDate" class="text-lg text-iosSubText font-medium"></div>
+        </header>
+
+        <!-- MAIN DIAGRAM CARD -->
+        <div class="bg-iosCard p-6 rounded-3xl shadow-xl space-y-4">
+            <div class="relative flex justify-center items-center h-56">
+                <!-- CHART.JS CANVAS -->
+                <canvas id="calorieChart"></canvas>
+                <!-- CENTER TEXT OVERLAY -->
+                <div class="absolute text-center">
+                    <div id="balanceLabel" class="text-5xl font-extrabold tracking-tight">--</div>
+                    <div class="text-sm text-iosSubText uppercase tracking-widest">KCAL BAL.</div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 text-center border-t border-iosNeutral pt-4">
+                <div>
+                    <div class="text-sm text-iosSubText">Intake (Goal: <span id="targetIntakeText">--</span>)</div>
+                    <div id="intakeDisplay" class="text-2xl font-bold text-iosAlert">0</div>
+                </div>
+                <div>
+                    <div class="text-sm text-iosSubText">Total Burn</div>
+                    <div id="burnDisplay" class="text-2xl font-bold text-iosActive">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENING MARCHING ORDERS -->
+        <div class="bg-iosCard p-5 rounded-2xl border-2 border-dashed border-iosActive/30">
+            <div class="flex items-center gap-3">
+                <div class="bg-iosActive/10 text-iosActive p-3 rounded-full">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div>
+                    <div class="text-sm text-iosSubText">EVENING STEP TARGET</div>
+                    <div id="stepTargetDisplay" class="text-2xl font-bold text-iosText">0 Steps</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INPUT CONTROLS -->
+        <div class="space-y-5">
+
+            <!-- MORNING SPORTS (Select) -->
+            <div class="bg-iosCard p-4 rounded-2xl">
+                <label class="block text-sm font-medium text-iosSubText mb-2">Morning Sport (Required)</label>
+                <select id="sportSelector" class="w-full bg-iosNeutral text-iosText p-4 rounded-xl text-lg appearance-none focus:ring-2 focus:ring-iosActive">
+                    <option value="0">Rest / Recovery (0 kcal)</option>
+                    <option value="600">Monday: Gym (2h) (600 kcal)</option>
+                    <option value="300">Tuesday: Legs (45m) (300 kcal)</option>
+                    <option value="600">Wednesday: Gym (2h) (600 kcal)</option>
+                    <option value="450">Thursday: Swim (450 kcal)</option>
+                    <option value="350">Friday: Calisthenics (1h) (350 kcal)</option>
+                </select>
+            </div>
+
+            <!-- THE VARIABLES (Toggles) -->
+            <div class="bg-iosCard p-4 rounded-2xl space-y-4">
+                <h3 class="text-sm font-medium text-iosSubText">Variable Intake</h3>
+                
+                <!-- WHEY (Slider for Half/Full) -->
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center">
+                        <label class="text-lg font-medium">Whey Shake</label>
+                        <span id="wheyValueLabel" class="text-lg font-bold text-iosAlert">None</span>
+                    </div>
+                    <input type="range" id="wheySlider" min="0" max="2" value="0" step="1" class="w-full h-3 bg-iosNeutral rounded-full appearance-none cursor-pointer accent-iosAlert">
+                    <div class="flex justify-between text-xs text-iosSubText px-1">
+                        <span>None</span>
+                        <span>Half</span>
+                        <span>Full</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-iosNeutral pt-3 flex justify-between items-center">
+                    <label class="text-lg font-medium">Cappuccino</label>
+                    <input type="checkbox" id="cappuccinoToggle" class="w-12 h-6 rounded-full appearance-none bg-iosNeutral relative cursor-pointer before:content-[''] before:absolute before:w-5 before:h-5 before:bg-white before:rounded-full before:left-0.5 before:top-0.5 before:transition-transform checked:before:translate-x-6 checked:bg-iosAlert">
+                </div>
+
+                <div class="border-t border-iosNeutral pt-3 flex justify-between items-center">
+                    <label class="text-lg font-medium">Extra Snack</label>
+                    <input type="checkbox" id="snackToggle" class="w-12 h-6 rounded-full appearance-none bg-iosNeutral relative cursor-pointer before:content-[''] before:absolute before:w-5 before:h-5 before:bg-white before:rounded-full before:left-0.5 before:top-0.5 before:transition-transform checked:before:translate-x-6 checked:bg-iosAlert">
+                </div>
+            </div>
+
+            <!-- STEPS WALKED (Input) -->
+            <div class="bg-iosCard p-4 rounded-2xl">
+                <label class="block text-sm font-medium text-iosSubText mb-2">Total Steps Walked (So far)</label>
+                <input type="number" id="stepsWalkedInput" placeholder="Enter total steps (e.g., 5500)" class="w-full bg-iosNeutral text-iosText p-4 rounded-xl text-lg focus:ring-2 focus:ring-iosActive">
+            </div>
+        </div>
+
+        <!-- SUBMIT/SAVE BUTTON -->
+        <button id="saveBtn" class="w-full bg-iosActive text-black font-bold text-xl p-5 rounded-2xl active:opacity-80 transition-opacity">Save Progress</button>
+
+        <p class="text-center text-xs text-iosSubText pb-6">Inputs saved locally to this iPhone. Refresh daily.</p>
+
+    </div>
+
+    <script>
+        // --- CONSTANTS & CONFIGURATION ---
+        const BMR_NEAT = 1800;  // Your base daily burn without exercise
+        const DEFICIT_GOAL = 500; // Your daily target caloric deficit
+        
+        // Fixed Baseline Food Intake (Breakfast, Lunch, Dinner, Fruits)
+        const FIXED_INTAKE = 400 + 650 + 700 + 150; // = 1900 kcal
+
+        // Calories per Variable Item
+        const CAL_WHEY_FULL = 140;
+        const CAL_WHEY_HALF = 70;
+        const CAL_CAPP = 120;
+        const CAL_SNACK = 200;
+
+        // --- DOM ELEMENTS ---
+        const els = {
+            date: document.getElementById('currentDate'),
+            sport: document.getElementById('sportSelector'),
+            whey: document.getElementById('wheySlider'),
+            wheyLabel: document.getElementById('wheyValueLabel'),
+            cappuccino: document.getElementById('cappuccinoToggle'),
+            snack: document.getElementById('snackToggle'),
+            steps: document.getElementById('stepsWalkedInput'),
+            save: document.getElementById('saveBtn'),
+            targetText: document.getElementById('targetIntakeText'),
+            intakeDisp: document.getElementById('intakeDisplay'),
+            burnDisp: document.getElementById('burnDisplay'),
+            balanceLabel: document.getElementById('balanceLabel'),
+            stepTarget: document.getElementById('stepTargetDisplay')
+        };
+
+        // Initialize Chart.js Doughnut Chart
+        let myChart;
+        function initChart() {
+            const ctx = document.getElementById('calorieChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [0, 100], // Consumption vs. Allowance
+                        backgroundColor: ['#FF3B30', '#3A3A3C'], // iosAlert, iosNeutral
+                        borderWidth: 0,
+                        cutout: '80%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    animation: { duration: 0 } // No animation for native instant feel
+                }
+            });
+        }
+
+        // --- CORE LOGIC: THE CALCULATION ENGINE ---
+        function calculate() {
+            // Get inputs
+            const sportBurn = parseInt(els.sport.value);
+            const stepsWalked = parseInt(els.steps.value) || 0;
+            const wheyVal = parseInt(els.whey.value); // 0, 1, 2
+            
+            // 1. Calculate the Dynamic Daily Allowance (Target Intake)
+            const tdee = BMR_NEAT + sportBurn;
+            const targetIntake = tdee - DEFICIT_GOAL;
+            
+            // 2. Calculate Variables Intake
+            let wheyCalories = 0;
+            if (wheyVal === 1) wheyCalories = CAL_WHEY_HALF;
+            else if (wheyVal === 2) wheyCalories = CAL_WHEY_FULL;
+
+            const variableIntake = wheyCalories + (els.cappuccino.checked ? CAL_CAPP : 0) + (els.snack.checked ? CAL_SNACK : 0);
+            const totalIntake = FIXED_INTAKE + variableIntake;
+
+            // 3. Calculate Real-Time Burn
+            const stepBurn = Math.round(stepsWalked * 0.04); // Approx kcal per step
+            const totalBurn = tdee + stepBurn;
+
+            // 4. Calculate Net Balance
+            // (Current Net Intake) - (What we are allowed)
+            // A positive balance means you have already eaten your allowance + sport allowance.
+            // A negative balance means you have room to eat or haven't walked enough to burn off food.
+            const netBalance = totalIntake - targetIntake - stepBurn;
+
+            // --- UPDATE UI ---
+            els.date.innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            els.targetText.innerText = targetIntake;
+            els.intakeDisp.innerText = totalIntake;
+            els.burnDisp.innerText = totalBurn;
+            
+            // Whey Label update
+            const wheyTextMap = ["None", "Half (+70)", "Full (+140)"];
+            els.wheyLabel.innerText = wheyTextMap[wheyVal];
+
+            // Dynamic Balance Display
+            if (netBalance > 0) {
+                els.balanceLabel.innerText = "+" + netBalance;
+                els.balanceLabel.classList.remove('text-iosActive');
+                els.balanceLabel.classList.add('text-iosAlert');
+            } else {
+                els.balanceLabel.innerText = netBalance; // Showing minus sign
+                els.balanceLabel.classList.remove('text-iosAlert');
+                els.balanceLabel.classList.add('text-iosActive');
+            }
+
+            // --- THE DIAGRAM (Rings) UPDATE ---
+            myChart.data.datasets[0].data = [totalIntake, Math.max(0, targetIntake + stepBurn - totalIntake)];
+            myChart.data.datasets[0].backgroundColor = (netBalance > 0) ? ['#FF3B30', '#3A3A3C'] : ['#30D158', '#3A3A3C'];
+            myChart.update();
+
+            // --- EVENING MARCHING ORDERS ENGINE ---
+            // If Net Balance is POSITIVE, you are currently failing the deficit. You need to walk.
+            // If Net Balance is NEGATIVE, you have exceeded your deficit target. Good job.
+            let eveningStepsNeeded = 0;
+            if (netBalance > 0) {
+                eveningStepsNeeded = Math.ceil(netBalance / 0.04);
+                els.stepTarget.innerText = eveningStepsNeeded.toLocaleString() + " Steps";
+                els.stepTarget.classList.add('text-iosAlert');
+                els.stepTarget.classList.remove('text-iosText');
+            } else {
+                els.stepTarget.innerText = "Target Hit! 🎉";
+                els.stepTarget.classList.remove('text-iosAlert');
+                els.stepTarget.classList.add('text-iosActive');
+            }
+        }
+
+        // --- LOCAL STORAGE: OFFLINE PERSISTENCE ---
+        function getStorageKey() {
+            // Generate a unique key for today (e.g., "tracker_2023-10-27")
+            return 'tracker_' + new Date().toISOString().split('T')[0];
+        }
+
+        function saveData() {
+            const data = {
+                sport: els.sport.value,
+                whey: els.whey.value,
+                cappuccino: els.cappuccino.checked,
+                snack: els.snack.checked,
+                steps: els.steps.value
+            };
+            localStorage.setItem(getStorageKey(), JSON.stringify(data));
+            
+            // Visual feedback for iOS
+            els.save.innerText = "Saved to iPhone ✓";
+            els.save.classList.replace('bg-iosActive', 'bg-iosNeutral');
+            els.save.classList.add('text-iosSubText');
+            setTimeout(() => {
+                els.save.innerText = "Save Progress";
+                els.save.classList.replace('bg-iosNeutral', 'bg-iosActive');
+                els.save.classList.remove('text-iosSubText');
+            }, 2000);
+        }
+
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem(getStorageKey()));
+            if (data) {
+                els.sport.value = data.sport;
+                els.whey.value = data.whey;
+                els.cappuccino.checked = data.cappuccino;
+                els.snack.checked = data.snack;
+                els.steps.value = data.steps;
+                calculate(); // Trigger recalculation after load
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+        initChart();
+        // Recalculate instantly on any input change
+        els.sport.addEventListener('input', calculate);
+        els.whey.addEventListener('input', calculate);
+        els.cappuccino.addEventListener('input', calculate);
+        els.snack.addEventListener('input', calculate);
+        els.steps.addEventListener('input', calculate);
+        els.save.addEventListener('click', saveData);
+
+        // Run calculation once on load to establish baseline
+        calculate();
+        // Attempt to load today's saved data
+        loadData();
+
+    </script>
+</body>
+</html>
