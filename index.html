@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Step Agent</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        iosBg: '#000000',
+                        iosCard: '#1C1C1E',
+                        iosActive: '#30D158', // Green for positive energy balance / deficit goals
+                        iosAlert: '#FF3B30',  // Red for energy surplus
+                        iosNeutral: '#2C2C2E',
+                        iosText: '#FFFFFF',
+                        iosSubText: '#8E8E93',
+                        iosWarning: '#FFD60A', // iOS Yellow for protein card accents
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        /* Custom hide spin buttons for input numbers on Safari/iOS */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6 lg:p-8 min-h-screen">
+
+    <div class="max-w-md mx-auto space-y-6">
+
+        <!-- HEADER -->
+        <header class="flex justify-between items-center pb-2 border-b border-iosNeutral">
+            <h1 class="text-3xl font-extrabold tracking-tight text-iosText">Step Agent</h1>
+            <div id="currentDate" class="text-sm text-iosSubText font-medium"></div>
+        </header>
+
+        <!-- MAIN DASHBOARD METRICS CARD -->
+        <div class="bg-iosCard p-6 rounded-3xl shadow-xl">
+            <div class="grid grid-cols-3 gap-1 items-center text-center">
+                
+                <!-- TOTAL INTAKE (LEFT) -->
+                <div class="flex flex-col justify-center py-2">
+                    <div class="text-xs text-iosAlert font-bold uppercase tracking-wide">Total Intake</div>
+                    <div id="intakeDisplay" class="text-lg sm:text-2xl font-extrabold text-iosAlert mt-1">0 kcal</div>
+                </div>
+
+                <!-- NET CALORIE STATUS (MIDDLE) -->
+                <div class="border-x border-iosNeutral/60 px-2 py-3 flex flex-col justify-center">
+                    <div id="balanceLabel" class="text-3xl sm:text-4xl font-black tracking-tight">--</div>
+                    <div class="text-[10px] text-iosSubText font-bold uppercase tracking-widest mt-1">NET KCAL</div>
+                </div>
+
+                <!-- TOTAL BURNT (RIGHT) -->
+                <div class="flex flex-col justify-center py-2">
+                    <div class="text-xs text-iosActive font-bold uppercase tracking-wide">Total Burnt</div>
+                    <div id="burnDisplay" class="text-lg sm:text-2xl font-extrabold text-iosActive mt-1">0 kcal</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- EVENING MARCHING ORDERS (TARGET CALCULATOR) -->
+        <div class="bg-iosCard p-5 rounded-3xl space-y-4">
+            <h3 class="text-sm font-semibold text-iosSubText uppercase tracking-wider flex items-center gap-2">
+                <svg class="w-5 h-5 text-iosActive" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="m15 10.42 4.8-5.07" />
+                    <path d="M19 18h3" />
+                    <path d="M9.5 22 21.414 9.415A2 2 0 0 0 21.2 6.4l-5.61-4.208A1 1 0 0 0 14 3v2a2 2 0 0 1-1.394 1.906L8.677 8.053A1 1 0 0 0 8 9c-.155 6.393-2.082 9-4 9a2 2 0 0 0 0 4h14" />
+                </svg>
+                Step Goals For Target Deficit
+            </h3>
+            
+            <div class="grid grid-cols-3 gap-3">
+                <!-- 300 CAL GOAL -->
+                <div class="bg-iosNeutral/50 p-3 rounded-2xl text-center flex flex-col justify-between">
+                    <div class="text-xs text-iosSubText font-medium">300 kcal</div>
+                    <div id="steps300Display" class="text-lg font-bold text-iosText mt-1">0</div>
+                    <div class="text-[10px] text-iosSubText uppercase mt-1">Steps</div>
+                </div>
+                <!-- 400 CAL GOAL -->
+                <div class="bg-iosNeutral/50 p-3 rounded-2xl text-center flex flex-col justify-between">
+                    <div class="text-xs text-iosSubText font-medium">400 kcal</div>
+                    <div id="steps400Display" class="text-lg font-bold text-iosText mt-1">0</div>
+                    <div class="text-[10px] text-iosSubText uppercase mt-1">Steps</div>
+                </div>
+                <!-- 500 CAL GOAL -->
+                <div class="bg-iosNeutral/50 p-3 rounded-2xl text-center flex flex-col justify-between">
+                    <div class="text-xs text-iosSubText font-medium">500 kcal</div>
+                    <div id="steps500Display" class="text-lg font-bold text-iosText mt-1">0</div>
+                    <div class="text-[10px] text-iosSubText uppercase mt-1">Steps</div>
+                </div>
+            </div>
+            <p class="text-[10px] text-iosSubText text-center italic">Calculated at 2.76 kcal burned per 100 steps (Total Burnt - Total Intake)</p>
+
+            <!-- Divider before step calculator -->
+            <div class="border-t border-iosNeutral/50 my-2"></div>
+
+            <!-- STEP BURN CALCULATOR -->
+            <div class="space-y-4">
+                <h4 class="text-sm font-semibold text-iosWarning uppercase tracking-wider flex items-center gap-2">
+                    <svg class="w-5 h-5 text-iosWarning" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+                    </svg>
+                    Step Burn Calculator
+                </h4>
+
+                <div class="grid grid-cols-2 gap-3 items-center">
+                    <div>
+                        <label class="text-[11px] text-iosSubText font-bold uppercase tracking-wider block mb-1">Current Steps</label>
+                        <!-- Steps Stepper design in warm amber colors -->
+                        <div class="flex items-center space-x-2 bg-[#251F10] p-1.5 rounded-2xl border border-iosWarning/30">
+                            <button type="button" id="stepsDecBtn" class="bg-[#543D11] text-white hover:bg-[#6E5016] font-bold w-9 h-9 rounded-xl flex items-center justify-center border border-iosWarning/20 active:scale-95 transition-transform text-lg">-</button>
+                            <input type="number" id="currentStepsInput" value="3000" min="0" placeholder="0" class="w-12 flex-1 bg-transparent text-center text-white text-lg font-extrabold focus:outline-none">
+                            <button type="button" id="stepsIncBtn" class="bg-[#543D11] text-white hover:bg-[#6E5016] font-bold w-9 h-9 rounded-xl flex items-center justify-center border border-iosWarning/20 active:scale-95 transition-transform text-lg">+</button>
+                        </div>
+                    </div>
+                    <div class="bg-iosNeutral/40 p-3 rounded-2xl text-center flex flex-col justify-center border border-iosNeutral/60 min-h-[74px]">
+                        <span class="text-[10px] text-iosSubText font-bold uppercase tracking-wider">Step Calories</span>
+                        <span id="stepCalorieDisplay" class="text-xl font-extrabold text-iosWarning mt-0.5">0 kcal</span>
+                    </div>
+                </div>
+
+                <!-- Combined Active Burn metric -->
+                <div class="bg-iosNeutral/35 p-4 rounded-2xl border border-iosNeutral/50">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-iosSubText font-medium">Combined Active Burn (Steps + Sport):</span>
+                        <span id="combinedActiveDisplay" class="font-bold text-iosText">0 kcal</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INPUT CONTROLS -->
+        <div class="space-y-4">
+
+            <!-- ACTIVITIES EXPENDITURE TRACKER (Slight green hue matching health layout) -->
+            <div class="bg-[#152A1C] border border-[#30D158]/20 p-5 rounded-3xl space-y-4">
+                <div class="flex justify-between items-center pb-2 border-b border-[#30D158]/10">
+                    <h3 class="text-sm font-semibold text-emerald-400 uppercase tracking-wider">Activities</h3>
+                    <!-- Pill style baseline burn subheader -->
+                    <span class="bg-[#30D158]/15 border border-[#30D158]/20 text-[10px] font-bold text-[#30D158] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        Baseline: 1650 kcal
+                    </span>
+                </div>
+                
+                <div class="flex justify-between items-center pt-2">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-emerald-50">Sport</label>
+                    </div>
+                    <div class="w-24">
+                        <input type="number" id="sportInput" placeholder="0" class="w-full bg-[#1A3A25] text-right text-emerald-50 p-2.5 rounded-xl font-bold focus:outline-none focus:ring-1 focus:ring-iosActive border border-[#30D158]/20">
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTAKE TRACKER (High Contrast Dark Red Hue Layout) -->
+            <div class="bg-[#2A1212] border border-red-900/40 p-5 rounded-3xl space-y-4">
+                <div class="flex justify-between items-center pb-2 border-b border-red-950/40">
+                    <h3 class="text-sm font-semibold text-red-300 uppercase tracking-wider">Intake</h3>
+                    <!-- Pill style baseline intake subheader -->
+                    <span class="bg-red-500/15 border border-red-500/25 text-[10px] font-bold text-red-300 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        Baseline: 1350 kcal
+                    </span>
+                </div>
+                
+                <!-- WHEY SHAKE TOGGLE -->
+                <div class="flex justify-between items-center py-2 border-b border-red-950/40">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-white">Whey Shake</label>
+                        <span class="text-xs text-red-300">+196 kcal</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="wheyToggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-[#4E2424] border border-red-800/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-iosActive"></div>
+                    </label>
+                </div>
+
+                <!-- CASEIN SHAKE TOGGLE -->
+                <div class="flex justify-between items-center py-2 border-b border-red-950/40">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-white">Casein Shake</label>
+                        <span class="text-xs text-red-300">+120 kcal</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="caseinToggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-[#4E2424] border border-red-800/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-iosActive"></div>
+                    </label>
+                </div>
+
+                <!-- EGGS STEPPER -->
+                <div class="flex justify-between items-center py-2 border-b border-red-950/40">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-white">Eggs</label>
+                        <span class="text-xs text-red-300">+65 kcal each</span>
+                    </div>
+                    <div class="flex items-center space-x-3 bg-[#1A0A0A] p-1.5 rounded-2xl border border-red-950">
+                        <button type="button" id="eggDecBtn" class="bg-[#5C1E1E] text-white hover:bg-[#732A2A] font-bold w-9 h-9 rounded-xl flex items-center justify-center border border-red-700/40 active:scale-95 transition-transform text-xl">-</button>
+                        <input type="number" id="eggInput" placeholder="0" class="w-10 bg-transparent text-center text-white text-lg font-extrabold focus:outline-none" readonly>
+                        <button type="button" id="eggIncBtn" class="bg-[#5C1E1E] text-white hover:bg-[#732A2A] font-bold w-9 h-9 rounded-xl flex items-center justify-center border border-red-700/40 active:scale-95 transition-transform text-xl">+</button>
+                    </div>
+                </div>
+
+                <!-- FRUITS TOGGLE -->
+                <div class="flex justify-between items-center py-2 border-b border-red-950/40">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-white">Fruits</label>
+                        <span class="text-xs text-red-300">+100 kcal</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="fruitsToggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-[#4E2424] border border-red-800/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-iosActive"></div>
+                    </label>
+                </div>
+
+                <!-- CAPPUCCINO TOGGLE -->
+                <div class="flex justify-between items-center py-2 border-b border-red-950/40">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-white">Cappuccino</label>
+                        <span class="text-xs text-red-300">+140 kcal</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="cappuccinoToggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-[#4E2424] border border-red-800/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-iosActive"></div>
+                    </label>
+                </div>
+
+                <!-- EXTRA KCAL INPUT -->
+                <div class="flex justify-between items-center py-2">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-white">Extra Calories</label>
+                        <span class="text-xs text-red-300">Custom addition (kcal)</span>
+                    </div>
+                    <div class="w-24">
+                        <input type="number" id="extraKcalInput" placeholder="0" class="w-full bg-[#3D1818] text-right text-white p-2.5 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-red-500 border border-red-800/60">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROTEIN CARD (Slight yellow/amber hue layout) -->
+            <div class="bg-[#2A2010] border border-amber-500/20 p-5 rounded-3xl space-y-4">
+                <div class="flex justify-between items-center pb-2 border-b border-amber-950/40">
+                    <h3 class="text-sm font-semibold text-amber-400 uppercase tracking-wider">Protein</h3>
+                    <span class="bg-amber-500/15 border border-amber-500/25 text-[10px] font-bold text-amber-300 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        Baseline: 93g
+                    </span>
+                </div>
+
+                <!-- PROTEIN DASHBOARD ROW -->
+                <div class="grid grid-cols-3 gap-1 items-center text-center py-2 bg-[#1C160B] rounded-2xl border border-amber-950">
+                    <!-- Target (Left) -->
+                    <div class="flex flex-col justify-center py-1">
+                        <div class="text-[10px] text-amber-400/80 font-bold uppercase tracking-wider">Target</div>
+                        <div class="text-lg font-black text-amber-100 mt-0.5">144g</div>
+                    </div>
+
+                    <!-- Difference (Middle) -->
+                    <div class="border-x border-amber-950 px-2 py-1 flex flex-col justify-center">
+                        <div id="proteinDiffDisplay" class="text-lg sm:text-xl font-black">--</div>
+                        <div class="text-[9px] text-amber-400/60 font-bold uppercase tracking-widest mt-0.5">DIFF</div>
+                    </div>
+
+                    <!-- Selected/Calculated Total (Right) -->
+                    <div class="flex flex-col justify-center py-1">
+                        <div class="text-[10px] text-amber-400/80 font-bold uppercase tracking-wider">Total</div>
+                        <div id="proteinTotalDisplay" class="text-lg font-black text-amber-300 mt-0.5">93g</div>
+                    </div>
+                </div>
+
+                <!-- EXTRA PROTEIN INPUT -->
+                <div class="flex justify-between items-center pt-2">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-white">Extra Protein</label>
+                        <span class="text-xs text-amber-300">Custom addition (g)</span>
+                    </div>
+                    <div class="w-24">
+                        <input type="number" id="extraProteinInput" placeholder="0" class="w-full bg-[#3D3018] text-right text-amber-100 p-2.5 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 border border-amber-800/40">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ACTION BUTTONS GRID -->
+        <div class="w-full">
+            <!-- Reset Button in a clean, iOS-style lighter grey -->
+            <button id="resetBtn" class="w-full bg-zinc-700 text-zinc-100 font-semibold text-lg p-5 rounded-2xl active:opacity-80 active:scale-[0.99] transition-all border border-zinc-600/30 hover:bg-zinc-600">Reset Form</button>
+        </div>
+
+        <p class="text-center text-xs text-iosSubText pb-6">Form saves and restores automatically using on-device storage.</p>
+
+    </div>
+
+    <!-- CODE CONTROLLERS -->
+    <script>
+        const BASE_INTAKE = 1350; // Every day begins with 1350 base
+        const BASE_BURNT = 1650;  // Every day has at least 1650 burnt
+        const KCAL_PER_100_STEPS = 2.76;
+        const KCAL_PER_STEP = KCAL_PER_100_STEPS / 100; // = 0.0276
+
+        const BASE_PROTEIN = 93;
+        const TARGET_PROTEIN = 144;
+
+        // Inputs & interactives DOM elements mapping
+        const els = {
+            date: document.getElementById('currentDate'),
+            whey: document.getElementById('wheyToggle'),
+            casein: document.getElementById('caseinToggle'),
+            eggDec: document.getElementById('eggDecBtn'),
+            eggInc: document.getElementById('eggIncBtn'),
+            eggVal: document.getElementById('eggInput'),
+            fruits: document.getElementById('fruitsToggle'),
+            cappuccino: document.getElementById('cappuccinoToggle'),
+            extraKcal: document.getElementById('extraKcalInput'),
+            sport: document.getElementById('sportInput'),
+            extraProtein: document.getElementById('extraProteinInput'),
+            reset: document.getElementById('resetBtn'),
+            intakeDisp: document.getElementById('intakeDisplay'),
+            burnDisp: document.getElementById('burnDisplay'),
+            balanceLabel: document.getElementById('balanceLabel'),
+            steps300: document.getElementById('steps300Display'),
+            steps400: document.getElementById('steps400Display'),
+            steps500: document.getElementById('steps500Display'),
+            proteinDiff: document.getElementById('proteinDiffDisplay'),
+            proteinTotal: document.getElementById('proteinTotalDisplay'),
+            currentSteps: document.getElementById('currentStepsInput'),
+            stepsDec: document.getElementById('stepsDecBtn'),
+            stepsInc: document.getElementById('stepsIncBtn'),
+            stepCalorieDisp: document.getElementById('stepCalorieDisplay'),
+            combinedActiveDisp: document.getElementById('combinedActiveDisplay')
+        };
+
+        // Safely write to local storage
+        function saveStateToLocalStorage() {
+            try {
+                const state = {
+                    whey: els.whey.checked,
+                    casein: els.casein.checked,
+                    eggs: els.eggVal.value,
+                    fruits: els.fruits.checked,
+                    cappuccino: els.cappuccino.checked,
+                    extraKcal: els.extraKcal.value,
+                    sport: els.sport.value,
+                    extraProtein: els.extraProtein.value,
+                    currentSteps: els.currentSteps.value
+                };
+                localStorage.setItem('stepAgent_savedState', JSON.stringify(state));
+            } catch (e) {
+                console.warn("Local storage write disabled or not permitted:", e);
+            }
+        }
+
+        // Safely read from local storage
+        function loadStateFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('stepAgent_savedState');
+                if (saved) {
+                    const state = JSON.parse(saved);
+                    els.whey.checked = !!state.whey;
+                    els.casein.checked = !!state.casein;
+                    els.eggVal.value = state.eggs !== undefined ? state.eggs : "";
+                    els.fruits.checked = !!state.fruits;
+                    els.cappuccino.checked = !!state.cappuccino;
+                    els.extraKcal.value = state.extraKcal !== undefined ? state.extraKcal : "";
+                    els.sport.value = state.sport !== undefined ? state.sport : "";
+                    els.extraProtein.value = state.extraProtein !== undefined ? state.extraProtein : "";
+                    els.currentSteps.value = state.currentSteps !== undefined ? state.currentSteps : "3000";
+                } else {
+                    // Default steps is 3000
+                    els.currentSteps.value = "3000";
+                }
+            } catch (e) {
+                console.warn("Local storage read disabled or failed:", e);
+                els.currentSteps.value = "3000"; // Fallback to safe default
+            }
+        }
+
+        function calculate() {
+            // Check & prevent negative steps manually
+            if (parseFloat(els.currentSteps.value) < 0 || isNaN(parseFloat(els.currentSteps.value)) || els.currentSteps.value === "") {
+                if (els.currentSteps.value !== "" && parseFloat(els.currentSteps.value) < 0) {
+                    els.currentSteps.value = "0";
+                }
+            }
+
+            // Retrieve input values
+            const wheyVal = els.whey.checked ? 196 : 0;
+            const caseinVal = els.casein.checked ? 120 : 0;
+            const eggsCount = parseInt(els.eggVal.value) || 0;
+            const eggVal = eggsCount * 65;
+            const fruitsVal = els.fruits.checked ? 100 : 0;
+            const cappuccinoVal = els.cappuccino.checked ? 140 : 0;
+            const extraKcalVal = parseFloat(els.extraKcal.value) || 0;
+
+            // Total Intake
+            const totalIntake = BASE_INTAKE + wheyVal + caseinVal + eggVal + fruitsVal + cappuccinoVal + extraKcalVal;
+
+            // Step Burn Logic
+            const stepsCount = parseFloat(els.currentSteps.value) || 0;
+            const stepBurn = stepsCount * KCAL_PER_STEP;
+
+            // Total Expenditure (Baseline + Sport + Step Burn)
+            const sportBurn = parseFloat(els.sport.value) || 0;
+            const totalBurnt = BASE_BURNT + sportBurn + stepBurn;
+
+            // Net balance math (Deficit is Burnt - Intake)
+            const balance = totalBurnt - totalIntake;
+
+            // Step Burn Calculator Metrics calculations
+            const combinedActiveBurn = stepBurn + sportBurn;
+
+            // Render basic metrics
+            els.intakeDisp.innerText = totalIntake + " kcal";
+            els.burnDisp.innerText = Math.round(totalBurnt) + " kcal";
+            els.date.innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+
+            // Render Step Burn section values
+            els.stepCalorieDisp.innerText = Math.round(stepBurn) + " kcal";
+            els.combinedActiveDisplay.innerText = Math.round(combinedActiveBurn) + " kcal";
+
+            // Display remaining kcal balance inside the middle header panel
+            if (balance > 0) {
+                els.balanceLabel.innerText = "+" + Math.round(balance);
+                els.balanceLabel.className = "text-3xl sm:text-4xl font-black tracking-tight text-iosActive";
+            } else {
+                els.balanceLabel.innerText = Math.round(balance); // automatically shows "-" sign
+                els.balanceLabel.className = "text-3xl sm:text-4xl font-black tracking-tight text-iosAlert";
+            }
+
+            // Target step goal math: Deficits of 300, 400, 500 (Total Burnt - Total Intake)
+            const targetDeficits = [300, 400, 500];
+            const displays = [els.steps300, els.steps400, els.steps500];
+
+            targetDeficits.forEach((target, index) => {
+                const diffNeeded = target - balance;
+                if (diffNeeded <= 0) {
+                    displays[index].innerText = "0";
+                } else {
+                    const steps = Math.ceil(diffNeeded / KCAL_PER_STEP);
+                    displays[index].innerText = steps.toLocaleString();
+                }
+            });
+
+            // Protein logic calculations
+            const wheyProtein = els.whey.checked ? 30 : 0;
+            const caseinProtein = els.casein.checked ? 24 : 0;
+            const eggProtein = eggsCount * 6;
+            const fruitsProtein = els.fruits.checked ? 1 : 0;
+            const cappuccinoProtein = els.cappuccino.checked ? 6 : 0;
+            const extraProteinVal = parseFloat(els.extraProtein.value) || 0;
+
+            const totalProtein = BASE_PROTEIN + wheyProtein + caseinProtein + eggProtein + fruitsProtein + cappuccinoProtein + extraProteinVal;
+            const proteinDiffVal = totalProtein - TARGET_PROTEIN;
+
+            els.proteinTotal.innerText = totalProtein + "g";
+
+            if (proteinDiffVal >= 0) {
+                els.proteinDiff.innerText = "+" + Math.round(proteinDiffVal) + "g";
+                els.proteinDiff.className = "text-lg sm:text-2xl font-black tracking-tight text-iosActive";
+            } else {
+                els.proteinDiff.innerText = Math.round(proteinDiffVal) + "g"; // automatically shows minus
+                els.proteinDiff.className = "text-lg sm:text-2xl font-black tracking-tight text-iosAlert";
+            }
+
+            // Trigger safe persistence write
+            saveStateToLocalStorage();
+        }
+
+        // Stepper functionality for Eggs
+        els.eggDec.addEventListener('click', () => {
+            let val = parseInt(els.eggVal.value) || 0;
+            if (val > 0) {
+                els.eggVal.value = val - 1;
+                calculate();
+            }
+        });
+
+        els.eggInc.addEventListener('click', () => {
+            let val = parseInt(els.eggVal.value) || 0;
+            els.eggVal.value = val + 1;
+            calculate();
+        });
+
+        // Stepper functionality for Steps (increments of 500)
+        els.stepsDec.addEventListener('click', () => {
+            let val = parseInt(els.currentSteps.value) || 0;
+            if (val >= 500) {
+                els.currentSteps.value = val - 500;
+            } else {
+                els.currentSteps.value = 0;
+            }
+            calculate();
+        });
+
+        els.stepsInc.addEventListener('click', () => {
+            let val = parseInt(els.currentSteps.value) || 0;
+            els.currentSteps.value = val + 500;
+            calculate();
+        });
+
+        // Listen for all input/change events to dynamically save and recalculate (Crucial for iOS checkboxes)
+        const inputs = [els.whey, els.casein, els.fruits, els.cappuccino, els.extraKcal, els.sport, els.extraProtein, els.currentSteps];
+        inputs.forEach(input => {
+            input.addEventListener('input', calculate);
+            input.addEventListener('change', calculate);
+        });
+
+        // Reset functionality
+        els.reset.addEventListener('click', () => {
+            els.whey.checked = false;
+            els.casein.checked = false;
+            els.eggVal.value = "";
+            els.fruits.checked = false;
+            els.cappuccino.checked = false;
+            els.extraKcal.value = "";
+            els.sport.value = "";
+            els.extraProtein.value = "";
+            els.currentSteps.value = "3000"; // resets back to default value of 3000
+            calculate();
+
+            // Clear standard local storage state
+            try {
+                localStorage.removeItem('stepAgent_savedState');
+            } catch (e) {
+                console.warn("Unable to clear local storage", e);
+            }
+
+            // Provide user feedback on button interaction
+            els.reset.innerText = "Cleared ✓";
+            els.reset.classList.replace('bg-zinc-700', 'bg-iosActive');
+            els.reset.classList.replace('text-zinc-100', 'text-black');
+            setTimeout(() => {
+                els.reset.innerText = "Reset Form";
+                els.reset.classList.replace('bg-iosActive', 'bg-zinc-700');
+                els.reset.classList.replace('text-black', 'text-zinc-100');
+            }, 1000);
+        });
+
+        // Load stored parameters and initiate calculations on program load
+        loadStateFromLocalStorage();
+        calculate();
+
+    </script>
+</body>
+</html>
