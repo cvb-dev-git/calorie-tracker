@@ -144,7 +144,8 @@
                         <!-- Steps Stepper design in warm amber colors -->
                         <div class="flex items-center space-x-2 bg-[#251F10] p-1.5 rounded-2xl border border-iosWarning/30">
                             <button type="button" id="stepsDecBtn" class="bg-[#543D11] text-white hover:bg-[#6E5016] font-bold w-9 h-9 rounded-xl flex items-center justify-center border border-iosWarning/20 active:scale-95 transition-transform text-lg">-</button>
-                            <input type="number" id="currentStepsInput" value="3000" min="0" placeholder="0" class="w-12 flex-1 bg-transparent text-center text-white text-lg font-extrabold focus:outline-none">
+                            <!-- Note: Added inputmode="numeric" and pattern="[0-9]*" for strict numeric keypad -->
+                            <input type="number" inputmode="numeric" pattern="[0-9]*" id="currentStepsInput" value="3000" min="0" placeholder="0" class="w-12 flex-1 bg-transparent text-center text-white text-lg font-extrabold focus:outline-none">
                             <button type="button" id="stepsIncBtn" class="bg-[#543D11] text-white hover:bg-[#6E5016] font-bold w-9 h-9 rounded-xl flex items-center justify-center border border-iosWarning/20 active:scale-95 transition-transform text-lg">+</button>
                         </div>
                     </div>
@@ -182,7 +183,8 @@
                         <label class="text-lg font-medium text-emerald-50">Sport</label>
                     </div>
                     <div class="w-24">
-                        <input type="number" id="sportInput" placeholder="0" class="w-full bg-[#1A3A25] text-right text-emerald-50 p-2.5 rounded-xl font-bold focus:outline-none focus:ring-1 focus:ring-iosActive border border-[#30D158]/20">
+                        <!-- Note: Added inputmode="numeric" and pattern="[0-9]*" for strict numeric keypad -->
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="sportInput" placeholder="0" class="w-full bg-[#1A3A25] text-right text-emerald-50 p-2.5 rounded-xl font-bold focus:outline-none focus:ring-1 focus:ring-iosActive border border-[#30D158]/20">
                     </div>
                 </div>
             </div>
@@ -265,7 +267,8 @@
                         <span class="text-xs text-red-300">Custom addition (kcal)</span>
                     </div>
                     <div class="w-24">
-                        <input type="number" id="extraKcalInput" placeholder="0" class="w-full bg-[#3D1818] text-right text-white p-2.5 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-red-500 border border-red-800/60">
+                        <!-- Note: Added inputmode="numeric" and pattern="[0-9]*" for strict numeric keypad -->
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="extraKcalInput" placeholder="0" class="w-full bg-[#3D1818] text-right text-white p-2.5 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-red-500 border border-red-800/60">
                     </div>
                 </div>
             </div>
@@ -307,7 +310,8 @@
                         <span class="text-xs text-amber-300">Custom addition (g)</span>
                     </div>
                     <div class="w-24">
-                        <input type="number" id="extraProteinInput" placeholder="0" class="w-full bg-[#3D3018] text-right text-amber-100 p-2.5 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 border border-amber-800/40">
+                        <!-- Note: Added inputmode="numeric" and pattern="[0-9]*" for strict numeric keypad -->
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="extraProteinInput" placeholder="0" class="w-full bg-[#3D3018] text-right text-amber-100 p-2.5 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 border border-amber-800/40">
                     </div>
                 </div>
             </div>
@@ -337,7 +341,7 @@
         // Inputs & interactives DOM elements mapping
         const els = {
             date: document.getElementById('currentDate'),
-            whey: document.getElementById('wheyToggle'),
+            whe: document.getElementById('wheyToggle'),
             casein: document.getElementById('caseinToggle'),
             eggDec: document.getElementById('eggDecBtn'),
             eggInc: document.getElementById('eggIncBtn'),
@@ -367,7 +371,7 @@
         function saveStateToLocalStorage() {
             try {
                 const state = {
-                    whey: els.whey.checked,
+                    whey: els.whe.checked,
                     casein: els.casein.checked,
                     eggs: els.eggVal.value,
                     fruits: els.fruits.checked,
@@ -389,7 +393,7 @@
                 const saved = localStorage.getItem('stepAgent_savedState');
                 if (saved) {
                     const state = JSON.parse(saved);
-                    els.whey.checked = !!state.whey;
+                    els.whe.checked = !!state.whey;
                     els.casein.checked = !!state.casein;
                     els.eggVal.value = state.eggs !== undefined ? state.eggs : "";
                     els.fruits.checked = !!state.fruits;
@@ -417,7 +421,7 @@
             }
 
             // Retrieve input values
-            const wheyVal = els.whey.checked ? 196 : 0;
+            const wheyVal = els.whe.checked ? 196 : 0;
             const caseinVal = els.casein.checked ? 120 : 0;
             const eggsCount = parseInt(els.eggVal.value) || 0;
             const eggVal = eggsCount * 65;
@@ -475,7 +479,7 @@
             });
 
             // Protein logic calculations
-            const wheyProtein = els.whey.checked ? 30 : 0;
+            const wheyProtein = els.whe.checked ? 30 : 0;
             const caseinProtein = els.casein.checked ? 24 : 0;
             const eggProtein = eggsCount * 6;
             const fruitsProtein = els.fruits.checked ? 1 : 0;
@@ -532,7 +536,7 @@
         });
 
         // Listen for both input and change events to ensure immediate calculation and state persistence on mobile WebKit
-        const inputs = [els.whey, els.casein, els.fruits, els.cappuccino, els.extraKcal, els.sport, els.extraProtein, els.currentSteps];
+        const inputs = [els.whe, els.casein, els.fruits, els.cappuccino, els.extraKcal, els.sport, els.extraProtein, els.currentSteps];
         inputs.forEach(input => {
             input.addEventListener('input', calculate);
             input.addEventListener('change', calculate);
@@ -540,7 +544,7 @@
 
         // Reset functionality
         els.reset.addEventListener('click', () => {
-            els.whey.checked = false;
+            els.whe.checked = false;
             els.casein.checked = false;
             els.eggVal.value = "";
             els.fruits.checked = false;
