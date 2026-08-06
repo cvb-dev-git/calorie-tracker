@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Step Agent</title>
+    <title>Calorie Burner</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -169,7 +169,6 @@
                 </div>
             </div>
 
-            <!-- INTAKE TRACKER (High Contrast Dark Red Hue Layout) -->
             <div class="bg-[#2A1212] border border-red-900/40 p-5 rounded-3xl space-y-4">
                 <div class="flex justify-between items-center pb-2 border-b border-red-950/40">
                     <h3 class="text-sm font-semibold text-red-300 uppercase tracking-wider">Intake</h3>
@@ -183,7 +182,7 @@
                 <div class="flex justify-between items-center py-2 border-b border-red-950/40">
                     <div class="flex flex-col">
                         <label class="text-lg font-medium text-white">Whey Shake</label>
-                        <span class="text-xs text-red-300">+196 kcal</span>
+                        <span class="text-xs text-red-300">+206 kcal / 30g Protein</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="wheyToggle" class="sr-only peer">
@@ -195,7 +194,7 @@
                 <div class="flex justify-between items-center py-2 border-b border-red-950/40">
                     <div class="flex flex-col">
                         <label class="text-lg font-medium text-white">Casein Shake</label>
-                        <span class="text-xs text-red-300">+120 kcal</span>
+                        <span class="text-xs text-red-300">+120 kcal / 24g Protein</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="caseinToggle" class="sr-only peer">
@@ -207,7 +206,7 @@
                 <div class="flex justify-between items-center py-2 border-b border-red-950/40">
                     <div class="flex flex-col">
                         <label class="text-lg font-medium text-white">Eggs</label>
-                        <span class="text-xs text-red-300">+65 kcal each</span>
+                        <span class="text-xs text-red-300">+65 kcal each / 6g Protein each</span>
                     </div>
                     <div class="flex items-center space-x-3 bg-[#1A0A0A] p-1.5 rounded-2xl border border-red-950">
                         <button type="button" id="eggDecBtn" class="bg-[#5C1E1E] text-white hover:bg-[#732A2A] font-bold w-9 h-9 rounded-xl flex items-center justify-center border border-red-700/40 active:scale-95 transition-transform text-xl">-</button>
@@ -220,7 +219,7 @@
                 <div class="flex justify-between items-center py-2 border-b border-red-950/40">
                     <div class="flex flex-col">
                         <label class="text-lg font-medium text-white">Fruits</label>
-                        <span class="text-xs text-red-300">+100 kcal</span>
+                        <span class="text-xs text-red-300">+100 kcal / 1g Protein</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="fruitsToggle" class="sr-only peer">
@@ -229,15 +228,26 @@
                 </div>
 
                 <!-- CAPPUCCINO TOGGLE -->
-                <div class="flex justify-between items-center py-2">
+                <div class="flex justify-between items-center py-2 border-b border-red-950/40">
                     <div class="flex flex-col">
                         <label class="text-lg font-medium text-white">Cappuccino</label>
-                        <span class="text-xs text-red-300">+140 kcal</span>
+                        <span class="text-xs text-red-300">+140 kcal / 6g Protein</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="cappuccinoToggle" class="sr-only peer">
                         <div class="w-11 h-6 bg-[#4E2424] border border-red-800/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-iosActive"></div>
                     </label>
+                </div>
+
+                <!-- EXTRA CALORIES NUMBER INPUT -->
+                <div class="flex justify-between items-center pt-1">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-white">Extra Calories</label>
+                        <span class="text-xs text-red-300">Custom kcal amount</span>
+                    </div>
+                    <div class="w-24">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="extraCaloriesInput" placeholder="0" class="w-full bg-[#1A0A0A] text-right text-white p-2.5 rounded-xl font-bold focus:outline-none focus:ring-1 focus:ring-iosActive border border-red-950">
+                    </div>
                 </div>
             </div>
 
@@ -288,12 +298,12 @@
     </div>
 
     <script>
-        const BASE_INTAKE = 1350; // Every day begins with 1350 base
+        const BASE_INTAKE = 1369; // Every day begins with 1350 base
         const BASE_BURNT = 1817;  // Every day has at least 1817 burnt
         const KCAL_PER_100_STEPS = 3.5;
         const KCAL_PER_STEP = KCAL_PER_100_STEPS / 100; // = 0.035
 
-        const BASE_PROTEIN = 93;
+        const BASE_PROTEIN = 91.5;
         const TARGET_PROTEIN = 144;
 
         // Inputs & interactives DOM elements mapping
@@ -306,6 +316,7 @@
             eggVal: document.getElementById('eggInput'),
             fruits: document.getElementById('fruitsToggle'),
             cappuccino: document.getElementById('cappuccinoToggle'),
+            extraCalories: document.getElementById('extraCaloriesInput'),
             sport: document.getElementById('sportInput'),
             customStepDec: document.getElementById('customStepDecBtn'),
             customStepInc: document.getElementById('customStepIncBtn'),
@@ -334,6 +345,7 @@
                     eggs: els.eggVal.value,
                     fruits: els.fruits.checked,
                     cappuccino: els.cappuccino.checked,
+                    extraCalories: els.extraCalories.value,
                     sport: els.sport.value,
                     customStep: els.customStepVal.value
                 };
@@ -354,6 +366,7 @@
                     els.eggVal.value = state.eggs !== undefined ? state.eggs : "";
                     els.fruits.checked = !!state.fruits;
                     els.cappuccino.checked = !!state.cappuccino;
+                    els.extraCalories.value = state.extraCalories !== undefined ? state.extraCalories : "";
                     els.sport.value = state.sport !== undefined ? state.sport : "";
                     els.customStepVal.value = state.customStep !== undefined && state.customStep !== "" ? state.customStep : "3000";
                 } else {
@@ -367,16 +380,17 @@
 
         function calculate() {
             // Retrieve input values
-            const wheyVal = els.whey.checked ? 196 : 0;
+            const wheyVal = els.whey.checked ? 206 : 0;
             const caseinVal = els.casein.checked ? 120 : 0;
             const eggsCount = parseInt(els.eggVal.value) || 0;
             const eggVal = eggsCount * 65;
             const fruitsVal = els.fruits.checked ? 100 : 0;
             const cappuccinoVal = els.cappuccino.checked ? 140 : 0;
+            const extraCaloriesVal = parseInt(els.extraCalories.value) || 0;
             const customStepOffset = parseInt(els.customStepVal.value) || 0;
 
-            // Total Intake
-            const totalIntake = BASE_INTAKE + wheyVal + caseinVal + eggVal + fruitsVal + cappuccinoVal;
+            // Total Intake including Extra Calories
+            const totalIntake = BASE_INTAKE + wheyVal + caseinVal + eggVal + fruitsVal + cappuccinoVal + extraCaloriesVal;
 
             // Total Expenditure (Baseline 1817 + Sport)
             const sportBurn = parseFloat(els.sport.value) || 0;
@@ -475,7 +489,7 @@
         });
 
         // Listen for all change event fields to dynamically fire calculations
-        const inputs = [els.whey, els.casein, els.fruits, els.cappuccino, els.sport, els.customStepVal];
+        const inputs = [els.whey, els.casein, els.fruits, els.cappuccino, els.extraCalories, els.sport, els.customStepVal];
         inputs.forEach(input => {
             input.addEventListener('input', calculate);
         });
@@ -487,6 +501,7 @@
             els.eggVal.value = "";
             els.fruits.checked = false;
             els.cappuccino.checked = false;
+            els.extraCalories.value = "";
             els.sport.value = "";
             els.customStepVal.value = "3000";
             calculate();
