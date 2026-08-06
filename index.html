@@ -5,15 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Calorie Tracker">
+    <title>Step Agent</title>
     
-    <!-- Premium vector-based home screen app icon (Footprint design with radial health-glow aura) -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231C1C1E'/%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%2330D158' stop-opacity='0.25'/%3E%3Cstop offset='100%25' stop-color='%2330D158' stop-opacity='0'/%3E%3C/radialGradient%3E%3Ccircle cx='90' cy='90' r='80' fill='url(%23g)'/%3E%3Cg fill='%2330D158'%3E%3Cpath d='M75,100 C75,85 85,75 95,75 C105,75 115,85 115,100 C115,115 105,125 95,125 C85,125 75,115 75,100 Z'/%3E%3Ccircle cx='80' cy='60' r='8'/%3E%3Ccircle cx='95' cy='52' r='9'/%3E%3Ccircle cx='110' cy='57' r='8'/%3E%3Ccircle cx='122' cy='70' r='7'/%3E%3Ccircle cx='68' cy='78' r='7'/%3E%3C/g%3E%3C/svg%3E">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231C1C1E'/%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%2330D158' stop-opacity='0.25'/%3E%3Cstop offset='100%25' stop-color='%2330D158' stop-opacity='0'/%3E%3C/radialGradient%3E%3Ccircle cx='90' cy='90' r='80' fill='url(%23g)'/%3E%3Cg fill='%2330D158'%3E%3Cpath d='M75,100 C75,85 85,75 95,75 C105,75 115,85 115,100 C115,115 105,125 95,125 C85,125 75,115 75,100 Z'/%3E%3Ccircle cx='80' cy='60' r='8'/%3E%3Ccircle cx='95' cy='52' r='9'/%3E%3Ccircle cx='110' cy='57' r='8'/%3E%3Ccircle cx='122' cy='70' r='7'/%3E%3Ccircle cx='68' cy='78' r='7'/%3E%3C/g%3E%3C/svg%3E">
-    
-    <title>Calorie Tracker</title>
-    
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -33,7 +26,6 @@
             }
         }
     </script>
-    
     <style>
         body {
             background-color: #000000;
@@ -62,10 +54,8 @@
 
         <!-- HEADER -->
         <header class="flex justify-between items-center pb-2 border-b border-iosNeutral">
-            <div class="flex flex-col">
-                <h1 class="text-3xl font-extrabold tracking-tight text-iosText">Calorie Tracker</h1>
-            </div>
-            <div id="currentDate" class="text-sm text-iosSubText font-medium text-right"></div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-iosText">Step Agent</h1>
+            <div id="currentDate" class="text-sm text-iosSubText font-medium"></div>
         </header>
 
         <!-- MAIN DASHBOARD METRICS CARD -->
@@ -94,7 +84,7 @@
         </div>
 
         <!-- EVENING MARCHING ORDERS (TARGET CALCULATOR) -->
-        <div class="bg-iosCard p-5 rounded-3xl space-y-4 border border-iosNeutral/40">
+        <div class="bg-iosCard p-5 rounded-3xl space-y-4">
             <h3 class="text-sm font-semibold text-iosSubText uppercase tracking-wider flex items-center gap-2">
                 <svg class="w-5 h-5 text-iosActive" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                     <path d="m15 10.42 4.8-5.07" />
@@ -106,63 +96,54 @@
             
             <div class="grid grid-cols-3 gap-3">
                 <!-- 300 CAL GOAL -->
-                <div class="bg-iosNeutral/50 p-3 rounded-2xl text-center flex flex-col justify-between border border-iosNeutral/30">
-                    <div class="text-xs text-iosSubText font-medium">300 kcal</div>
-                    <div id="steps300Display" class="text-lg font-bold text-iosText mt-1">0</div>
-                    <div class="text-[10px] text-iosSubText uppercase mt-1">Steps</div>
+                <div class="bg-iosNeutral/50 p-3 rounded-2xl text-center flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs text-iosSubText font-medium">300 kcal</div>
+                        <div id="steps300Display" class="text-base sm:text-lg font-bold text-iosText mt-1">0</div>
+                        <div class="text-[9px] text-iosSubText uppercase mt-0.5">Steps</div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-iosNeutral/60">
+                        <div class="text-[9px] text-iosActive font-bold uppercase tracking-wider">Total</div>
+                        <div id="totalSteps300Display" class="text-xs sm:text-sm font-extrabold text-emerald-400 mt-0.5">0</div>
+                    </div>
                 </div>
                 <!-- 400 CAL GOAL -->
-                <div class="bg-iosNeutral/50 p-3 rounded-2xl text-center flex flex-col justify-between border border-iosNeutral/30">
-                    <div class="text-xs text-iosSubText font-medium">400 kcal</div>
-                    <div id="steps400Display" class="text-lg font-bold text-iosText mt-1">0</div>
-                    <div class="text-[10px] text-iosSubText uppercase mt-1">Steps</div>
+                <div class="bg-iosNeutral/50 p-3 rounded-2xl text-center flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs text-iosSubText font-medium">400 kcal</div>
+                        <div id="steps400Display" class="text-base sm:text-lg font-bold text-iosText mt-1">0</div>
+                        <div class="text-[9px] text-iosSubText uppercase mt-0.5">Steps</div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-iosNeutral/60">
+                        <div class="text-[9px] text-iosActive font-bold uppercase tracking-wider">Total</div>
+                        <div id="totalSteps400Display" class="text-xs sm:text-sm font-extrabold text-emerald-400 mt-0.5">0</div>
+                    </div>
                 </div>
                 <!-- 500 CAL GOAL -->
-                <div class="bg-iosNeutral/50 p-3 rounded-2xl text-center flex flex-col justify-between border border-iosNeutral/30">
-                    <div class="text-xs text-iosSubText font-medium">500 kcal</div>
-                    <div id="steps500Display" class="text-lg font-bold text-iosText mt-1">0</div>
-                    <div class="text-[10px] text-iosSubText uppercase mt-1">Steps</div>
-                </div>
-            </div>
-            <p class="text-[10px] text-iosSubText text-center italic">Calculated at 2.76 kcal burned per 100 steps (Total Burnt - Total Intake)</p>
-
-            <!-- Divider before step calculator -->
-            <div class="border-t border-iosNeutral/50 my-2"></div>
-
-            <!-- STEP BURN CALCULATOR -->
-            <div class="space-y-4">
-                <h4 class="text-sm font-semibold text-iosWarning uppercase tracking-wider flex items-center gap-2">
-                    <svg class="w-5 h-5 text-iosWarning" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-                    </svg>
-                    Step Burn Calculator
-                </h4>
-
-                <div class="grid grid-cols-2 gap-3 items-center">
+                <div class="bg-iosNeutral/50 p-3 rounded-2xl text-center flex flex-col justify-between">
                     <div>
-                        <label class="text-[11px] text-iosSubText font-bold uppercase tracking-wider block mb-1">Current Steps</label>
-                        <!-- Steps Stepper design in warm amber colors -->
-                        <div class="flex items-center space-x-2 bg-[#251F10] p-1.5 rounded-2xl border border-iosWarning/30">
-                            <button type="button" id="stepsDecBtn" class="bg-[#543D11] text-white hover:bg-[#6E5016] font-bold w-9 h-9 rounded-xl flex items-center justify-center border border-iosWarning/20 active:scale-95 transition-transform text-lg">-</button>
-                            <!-- Note: Added inputmode="numeric" and pattern="[0-9]*" for strict numeric keypad -->
-                            <input type="number" inputmode="numeric" pattern="[0-9]*" id="currentStepsInput" value="3000" min="0" placeholder="0" class="w-12 flex-1 bg-transparent text-center text-white text-lg font-extrabold focus:outline-none">
-                            <button type="button" id="stepsIncBtn" class="bg-[#543D11] text-white hover:bg-[#6E5016] font-bold w-9 h-9 rounded-xl flex items-center justify-center border border-iosWarning/20 active:scale-95 transition-transform text-lg">+</button>
-                        </div>
+                        <div class="text-xs text-iosSubText font-medium">500 kcal</div>
+                        <div id="steps500Display" class="text-base sm:text-lg font-bold text-iosText mt-1">0</div>
+                        <div class="text-[9px] text-iosSubText uppercase mt-0.5">Steps</div>
                     </div>
-                    <div class="bg-iosNeutral/40 p-3 rounded-2xl text-center flex flex-col justify-center border border-iosNeutral/60 min-h-[74px]">
-                        <span class="text-[10px] text-iosSubText font-bold uppercase tracking-wider">Step Calories</span>
-                        <span id="stepCalorieDisplay" class="text-xl font-extrabold text-iosWarning mt-0.5">0 kcal</span>
-                    </div>
-                </div>
-
-                <!-- Combined Active Burn metric -->
-                <div class="bg-iosNeutral/35 p-4 rounded-2xl border border-iosNeutral/50">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-iosSubText font-medium">Combined Active Burn (Steps + Sport):</span>
-                        <span id="combinedActiveDisplay" class="font-bold text-iosText">0 kcal</span>
+                    <div class="mt-2 pt-2 border-t border-iosNeutral/60">
+                        <div class="text-[9px] text-iosActive font-bold uppercase tracking-wider">Total</div>
+                        <div id="totalSteps500Display" class="text-xs sm:text-sm font-extrabold text-emerald-400 mt-0.5">0</div>
                     </div>
                 </div>
             </div>
+
+            <!-- STEP GOALS CUSTOM STEPPER INPUT ADDITION -->
+            <div class="pt-2 border-t border-iosNeutral/40 flex items-center justify-between">
+                <span class="text-xs text-iosSubText font-medium">Current Steps</span>
+                <div class="flex items-center space-x-2 bg-iosNeutral/50 p-1 rounded-2xl border border-iosNeutral">
+                    <button type="button" id="customStepDecBtn" class="bg-iosNeutral text-white hover:bg-zinc-700 font-bold w-8 h-8 rounded-xl flex items-center justify-center active:scale-95 transition-transform text-lg">-</button>
+                    <input type="number" id="customStepInput" placeholder="0" class="w-16 bg-transparent text-center text-white text-base font-bold focus:outline-none placeholder:text-zinc-500">
+                    <button type="button" id="customStepIncBtn" class="bg-iosNeutral text-white hover:bg-zinc-700 font-bold w-8 h-8 rounded-xl flex items-center justify-center active:scale-95 transition-transform text-lg">+</button>
+                </div>
+            </div>
+
+            <p class="text-[10px] text-iosSubText text-center italic">Calculated at 3.5 kcal burned per 100 steps</p>
         </div>
 
         <!-- INPUT CONTROLS -->
@@ -171,20 +152,19 @@
             <!-- ACTIVITIES EXPENDITURE TRACKER (Slight green hue matching health layout) -->
             <div class="bg-[#152A1C] border border-[#30D158]/20 p-5 rounded-3xl space-y-4">
                 <div class="flex justify-between items-center pb-2 border-b border-[#30D158]/10">
-                    <h3 class="text-sm font-semibold text-emerald-400 uppercase tracking-wider">Activities</h3>
+                    <h3 class="text-sm font-semibold text-emerald-400 uppercase tracking-wider">Move</h3>
                     <!-- Pill style baseline burn subheader -->
                     <span class="bg-[#30D158]/15 border border-[#30D158]/20 text-[10px] font-bold text-[#30D158] px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        Baseline: 1650 kcal
+                        Baseline: 1817 kcal
                     </span>
                 </div>
                 
                 <div class="flex justify-between items-center pt-2">
                     <div class="flex flex-col">
-                        <label class="text-lg font-medium text-emerald-50">Sport</label>
+                        <label class="text-lg font-medium text-emerald-50">Active Calories</label>
                     </div>
                     <div class="w-24">
-                        <!-- Note: Added inputmode="numeric" and pattern="[0-9]*" for strict numeric keypad -->
-                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="sportInput" placeholder="0" class="w-full bg-[#1A3A25] text-right text-emerald-50 p-2.5 rounded-xl font-bold focus:outline-none focus:ring-1 focus:ring-iosActive border border-[#30D158]/20">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="sportInput" placeholder="0" class="w-full bg-[#1A3A25] text-right text-emerald-50 p-2.5 rounded-xl font-bold focus:outline-none focus:ring-1 focus:ring-iosActive border border-[#30D158]/20">
                     </div>
                 </div>
             </div>
@@ -249,7 +229,7 @@
                 </div>
 
                 <!-- CAPPUCCINO TOGGLE -->
-                <div class="flex justify-between items-center py-2 border-b border-red-950/40">
+                <div class="flex justify-between items-center py-2">
                     <div class="flex flex-col">
                         <label class="text-lg font-medium text-white">Cappuccino</label>
                         <span class="text-xs text-red-300">+140 kcal</span>
@@ -259,27 +239,12 @@
                         <div class="w-11 h-6 bg-[#4E2424] border border-red-800/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-iosActive"></div>
                     </label>
                 </div>
-
-                <!-- EXTRA KCAL INPUT -->
-                <div class="flex justify-between items-center py-2">
-                    <div class="flex flex-col">
-                        <label class="text-lg font-medium text-white">Extra Calories</label>
-                        <span class="text-xs text-red-300">Custom addition (kcal)</span>
-                    </div>
-                    <div class="w-24">
-                        <!-- Note: Added inputmode="numeric" and pattern="[0-9]*" for strict numeric keypad -->
-                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="extraKcalInput" placeholder="0" class="w-full bg-[#3D1818] text-right text-white p-2.5 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-red-500 border border-red-800/60">
-                    </div>
-                </div>
             </div>
 
             <!-- PROTEIN CARD (Slight yellow/amber hue layout) -->
             <div class="bg-[#2A2010] border border-amber-500/20 p-5 rounded-3xl space-y-4">
                 <div class="flex justify-between items-center pb-2 border-b border-amber-950/40">
                     <h3 class="text-sm font-semibold text-amber-400 uppercase tracking-wider">Protein</h3>
-                    <span class="bg-amber-500/15 border border-amber-500/25 text-[10px] font-bold text-amber-300 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        Baseline: 93g
-                    </span>
                 </div>
 
                 <!-- PROTEIN DASHBOARD ROW -->
@@ -303,16 +268,10 @@
                     </div>
                 </div>
 
-                <!-- EXTRA PROTEIN INPUT -->
-                <div class="flex justify-between items-center pt-2">
-                    <div class="flex flex-col">
-                        <label class="text-lg font-medium text-white">Extra Protein</label>
-                        <span class="text-xs text-amber-300">Custom addition (g)</span>
-                    </div>
-                    <div class="w-24">
-                        <!-- Note: Added inputmode="numeric" and pattern="[0-9]*" for strict numeric keypad -->
-                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="extraProteinInput" placeholder="0" class="w-full bg-[#3D3018] text-right text-amber-100 p-2.5 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 border border-amber-800/40">
-                    </div>
+                <!-- WEIGHT-PROTEIN MULTIPLIER SUBCARD -->
+                <div class="bg-[#1C160B]/70 p-3 rounded-2xl text-center border border-amber-950/60">
+                    <div class="text-[10px] text-amber-400/80 font-bold uppercase tracking-wider">Weight-Protein Multiplier (72 kg)</div>
+                    <div id="proteinMultiplierDisplay" class="text-lg font-extrabold text-amber-200 mt-0.5">1.29x</div>
                 </div>
             </div>
 
@@ -328,12 +287,11 @@
 
     </div>
 
-    <!-- CODE CONTROLLERS -->
     <script>
         const BASE_INTAKE = 1350; // Every day begins with 1350 base
-        const BASE_BURNT = 1650;  // Every day has at least 1650 burnt
-        const KCAL_PER_100_STEPS = 2.76;
-        const KCAL_PER_STEP = KCAL_PER_100_STEPS / 100; // = 0.0276
+        const BASE_BURNT = 1817;  // Every day has at least 1817 burnt
+        const KCAL_PER_100_STEPS = 3.5;
+        const KCAL_PER_STEP = KCAL_PER_100_STEPS / 100; // = 0.035
 
         const BASE_PROTEIN = 93;
         const TARGET_PROTEIN = 144;
@@ -341,16 +299,17 @@
         // Inputs & interactives DOM elements mapping
         const els = {
             date: document.getElementById('currentDate'),
-            whe: document.getElementById('wheyToggle'),
+            whey: document.getElementById('wheyToggle'),
             casein: document.getElementById('caseinToggle'),
             eggDec: document.getElementById('eggDecBtn'),
             eggInc: document.getElementById('eggIncBtn'),
             eggVal: document.getElementById('eggInput'),
             fruits: document.getElementById('fruitsToggle'),
             cappuccino: document.getElementById('cappuccinoToggle'),
-            extraKcal: document.getElementById('extraKcalInput'),
             sport: document.getElementById('sportInput'),
-            extraProtein: document.getElementById('extraProteinInput'),
+            customStepDec: document.getElementById('customStepDecBtn'),
+            customStepInc: document.getElementById('customStepIncBtn'),
+            customStepVal: document.getElementById('customStepInput'),
             reset: document.getElementById('resetBtn'),
             intakeDisp: document.getElementById('intakeDisplay'),
             burnDisp: document.getElementById('burnDisplay'),
@@ -358,28 +317,25 @@
             steps300: document.getElementById('steps300Display'),
             steps400: document.getElementById('steps400Display'),
             steps500: document.getElementById('steps500Display'),
+            totalSteps300: document.getElementById('totalSteps300Display'),
+            totalSteps400: document.getElementById('totalSteps400Display'),
+            totalSteps500: document.getElementById('totalSteps500Display'),
             proteinDiff: document.getElementById('proteinDiffDisplay'),
             proteinTotal: document.getElementById('proteinTotalDisplay'),
-            currentSteps: document.getElementById('currentStepsInput'),
-            stepsDec: document.getElementById('stepsDecBtn'),
-            stepsInc: document.getElementById('stepsIncBtn'),
-            stepCalorieDisp: document.getElementById('stepCalorieDisplay'),
-            combinedActiveDisplay: document.getElementById('combinedActiveDisplay')
+            proteinMultiplier: document.getElementById('proteinMultiplierDisplay')
         };
 
         // Safely write to local storage
         function saveStateToLocalStorage() {
             try {
                 const state = {
-                    whey: els.whe.checked,
+                    whey: els.whey.checked,
                     casein: els.casein.checked,
                     eggs: els.eggVal.value,
                     fruits: els.fruits.checked,
                     cappuccino: els.cappuccino.checked,
-                    extraKcal: els.extraKcal.value,
                     sport: els.sport.value,
-                    extraProtein: els.extraProtein.value,
-                    currentSteps: els.currentSteps.value
+                    customStep: els.customStepVal.value
                 };
                 localStorage.setItem('stepAgent_savedState', JSON.stringify(state));
             } catch (e) {
@@ -393,67 +349,46 @@
                 const saved = localStorage.getItem('stepAgent_savedState');
                 if (saved) {
                     const state = JSON.parse(saved);
-                    els.whe.checked = !!state.whey;
+                    els.whey.checked = !!state.whey;
                     els.casein.checked = !!state.casein;
                     els.eggVal.value = state.eggs !== undefined ? state.eggs : "";
                     els.fruits.checked = !!state.fruits;
                     els.cappuccino.checked = !!state.cappuccino;
-                    els.extraKcal.value = state.extraKcal !== undefined ? state.extraKcal : "";
                     els.sport.value = state.sport !== undefined ? state.sport : "";
-                    els.extraProtein.value = state.extraProtein !== undefined ? state.extraProtein : "";
-                    els.currentSteps.value = state.currentSteps !== undefined ? state.currentSteps : "3000";
+                    els.customStepVal.value = state.customStep !== undefined && state.customStep !== "" ? state.customStep : "3000";
                 } else {
-                    // Default steps is 3000
-                    els.currentSteps.value = "3000";
+                    els.customStepVal.value = "3000";
                 }
             } catch (e) {
                 console.warn("Local storage read disabled or failed:", e);
-                els.currentSteps.value = "3000"; // Fallback to safe default
+                els.customStepVal.value = "3000";
             }
         }
 
         function calculate() {
-            // Check & prevent negative steps manually
-            if (parseFloat(els.currentSteps.value) < 0 || isNaN(parseFloat(els.currentSteps.value))) {
-                if (els.currentSteps.value !== "") {
-                    els.currentSteps.value = "0";
-                }
-            }
-
             // Retrieve input values
-            const wheyVal = els.whe.checked ? 196 : 0;
+            const wheyVal = els.whey.checked ? 196 : 0;
             const caseinVal = els.casein.checked ? 120 : 0;
             const eggsCount = parseInt(els.eggVal.value) || 0;
             const eggVal = eggsCount * 65;
             const fruitsVal = els.fruits.checked ? 100 : 0;
             const cappuccinoVal = els.cappuccino.checked ? 140 : 0;
-            const extraKcalVal = parseFloat(els.extraKcal.value) || 0;
+            const customStepOffset = parseInt(els.customStepVal.value) || 0;
 
             // Total Intake
-            const totalIntake = BASE_INTAKE + wheyVal + caseinVal + eggVal + fruitsVal + cappuccinoVal + extraKcalVal;
+            const totalIntake = BASE_INTAKE + wheyVal + caseinVal + eggVal + fruitsVal + cappuccinoVal;
 
-            // Step Burn Logic
-            const stepsCount = parseFloat(els.currentSteps.value) || 0;
-            const stepBurn = stepsCount * KCAL_PER_STEP;
-
-            // Total Expenditure (Baseline + Sport + Step Burn)
+            // Total Expenditure (Baseline 1817 + Sport)
             const sportBurn = parseFloat(els.sport.value) || 0;
-            const totalBurnt = BASE_BURNT + sportBurn + stepBurn;
+            const totalBurnt = BASE_BURNT + sportBurn;
 
             // Net balance math (Deficit is Burnt - Intake)
             const balance = totalBurnt - totalIntake;
-
-            // Step Burn Calculator Metrics calculations
-            const combinedActiveBurn = stepBurn + sportBurn;
 
             // Render basic metrics
             els.intakeDisp.innerText = totalIntake + " kcal";
             els.burnDisp.innerText = Math.round(totalBurnt) + " kcal";
             els.date.innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-
-            // Render Step Burn section values
-            els.stepCalorieDisp.innerText = Math.round(stepBurn) + " kcal";
-            els.combinedActiveDisplay.innerText = Math.round(combinedActiveBurn) + " kcal";
 
             // Display remaining kcal balance inside the middle header panel
             if (balance > 0) {
@@ -464,39 +399,47 @@
                 els.balanceLabel.className = "text-3xl sm:text-4xl font-black tracking-tight text-iosAlert";
             }
 
-            // Target step goal math: Deficits of 300, 400, 500 (Total Burnt - Total Intake)
+            // Target step goal math: Deficits of 300, 400, 500
             const targetDeficits = [300, 400, 500];
-            const displays = [els.steps300, els.steps400, els.steps500];
+            const stepDisplays = [els.steps300, els.steps400, els.steps500];
+            const totalStepDisplays = [els.totalSteps300, els.totalSteps400, els.totalSteps500];
 
             targetDeficits.forEach((target, index) => {
                 const diffNeeded = target - balance;
-                if (diffNeeded <= 0) {
-                    displays[index].innerText = "0";
-                } else {
-                    const steps = Math.ceil(diffNeeded / KCAL_PER_STEP);
-                    displays[index].innerText = steps.toLocaleString();
+                let stepsNeeded = 0;
+                if (diffNeeded > 0) {
+                    stepsNeeded = Math.ceil(diffNeeded / KCAL_PER_STEP);
                 }
+                
+                stepDisplays[index].innerText = stepsNeeded.toLocaleString();
+                
+                // Calculate total steps as target steps + custom step offset
+                const combinedTotal = stepsNeeded + customStepOffset;
+                totalStepDisplays[index].innerText = combinedTotal > 0 ? combinedTotal.toLocaleString() : "0";
             });
 
             // Protein logic calculations
-            const wheyProtein = els.whe.checked ? 30 : 0;
+            const wheyProtein = els.whey.checked ? 30 : 0;
             const caseinProtein = els.casein.checked ? 24 : 0;
             const eggProtein = eggsCount * 6;
             const fruitsProtein = els.fruits.checked ? 1 : 0;
             const cappuccinoProtein = els.cappuccino.checked ? 6 : 0;
-            const extraProteinVal = parseFloat(els.extraProtein.value) || 0;
 
-            const totalProtein = BASE_PROTEIN + wheyProtein + caseinProtein + eggProtein + fruitsProtein + cappuccinoProtein + extraProteinVal;
+            const totalProtein = BASE_PROTEIN + wheyProtein + caseinProtein + eggProtein + fruitsProtein + cappuccinoProtein;
             const proteinDiffVal = totalProtein - TARGET_PROTEIN;
 
             els.proteinTotal.innerText = totalProtein + "g";
 
+            // Weight-protein multiplier calculation (total value divided by 72, 2 decimals)
+            const multiplier = (totalProtein / 72).toFixed(2);
+            els.proteinMultiplier.innerText = multiplier + "x";
+
             if (proteinDiffVal >= 0) {
                 els.proteinDiff.innerText = "+" + Math.round(proteinDiffVal) + "g";
-                els.proteinDiff.className = "text-lg sm:text-2xl font-black tracking-tight text-iosActive";
+                els.proteinDiff.className = "text-lg sm:text-xl font-black tracking-tight text-iosActive";
             } else {
                 els.proteinDiff.innerText = Math.round(proteinDiffVal) + "g"; // automatically shows minus
-                els.proteinDiff.className = "text-lg sm:text-2xl font-black tracking-tight text-[#FF9500]"; // Amber warning for under-target protein
+                els.proteinDiff.className = "text-lg sm:text-xl font-black tracking-tight text-iosAlert";
             }
 
             // Trigger safe persistence write
@@ -518,41 +461,34 @@
             calculate();
         });
 
-        // Stepper functionality for Steps (increments of 500)
-        els.stepsDec.addEventListener('click', () => {
-            let val = parseInt(els.currentSteps.value) || 0;
-            if (val >= 500) {
-                els.currentSteps.value = val - 500;
-            } else {
-                els.currentSteps.value = 0;
-            }
+        // Stepper functionality for Custom Step Goal offset
+        els.customStepDec.addEventListener('click', () => {
+            let val = parseInt(els.customStepVal.value) || 0;
+            els.customStepVal.value = Math.max(0, val - 500);
             calculate();
         });
 
-        els.stepsInc.addEventListener('click', () => {
-            let val = parseInt(els.currentSteps.value) || 0;
-            els.currentSteps.value = val + 500;
+        els.customStepInc.addEventListener('click', () => {
+            let val = parseInt(els.customStepVal.value) || 0;
+            els.customStepVal.value = val + 500;
             calculate();
         });
 
-        // Listen for both input and change events to ensure immediate calculation and state persistence on mobile WebKit
-        const inputs = [els.whe, els.casein, els.fruits, els.cappuccino, els.extraKcal, els.sport, els.extraProtein, els.currentSteps];
+        // Listen for all change event fields to dynamically fire calculations
+        const inputs = [els.whey, els.casein, els.fruits, els.cappuccino, els.sport, els.customStepVal];
         inputs.forEach(input => {
             input.addEventListener('input', calculate);
-            input.addEventListener('change', calculate);
         });
 
         // Reset functionality
         els.reset.addEventListener('click', () => {
-            els.whe.checked = false;
+            els.whey.checked = false;
             els.casein.checked = false;
             els.eggVal.value = "";
             els.fruits.checked = false;
             els.cappuccino.checked = false;
-            els.extraKcal.value = "";
             els.sport.value = "";
-            els.extraProtein.value = "";
-            els.currentSteps.value = "3000"; // resets back to default value of 3000
+            els.customStepVal.value = "3000";
             calculate();
 
             // Clear standard local storage state
