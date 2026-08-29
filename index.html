@@ -160,7 +160,7 @@
                     <h3 class="text-sm font-semibold text-emerald-400 uppercase tracking-wider">Move</h3>
                     <!-- Pill style baseline burn subheader -->
                     <span class="bg-[#30D158]/15 border border-[#30D158]/20 text-[10px] font-bold text-[#30D158] px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        Baseline: 1817 kcal
+                        Baseline: 1800 kcal
                     </span>
                 </div>
                 
@@ -315,7 +315,7 @@
 
     <script>
         const BASE_INTAKE = 1369; // Every day begins with base intake
-        const BASE_BURNT = 1817;  // Every day has at least 1817 burnt
+        const BASE_BURNT = 1800;  // Every day has at least 1800 burnt
         const KCAL_PER_100_STEPS = 3.5;
         const KCAL_PER_STEP = KCAL_PER_100_STEPS / 100; // = 0.035
 
@@ -411,7 +411,7 @@
             // Total Intake including Extra Calories
             const totalIntake = BASE_INTAKE + wheyVal + caseinVal + eggVal + fruitsVal + cappuccinoVal + extraCaloriesVal;
 
-            // Total Expenditure (Baseline 1817 + Sport)
+            // Total Expenditure (Baseline 1800 + Sport)
             const sportBurn = parseFloat(els.sport.value) || 0;
             const totalBurnt = BASE_BURNT + sportBurn;
 
