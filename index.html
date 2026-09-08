@@ -174,12 +174,13 @@
                 </div>
             </div>
 
+            <!-- INTAKE TRACKER CARD -->
             <div class="bg-[#2A1212] border border-red-900/40 p-5 rounded-3xl space-y-4">
                 <div class="flex justify-between items-center pb-2 border-b border-red-950/40">
                     <h3 class="text-sm font-semibold text-red-300 uppercase tracking-wider">Intake</h3>
                     <!-- Pill style baseline intake subheader -->
                     <span class="bg-red-500/15 border border-red-500/25 text-[10px] font-bold text-red-300 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        Baseline: 1369 kcal
+                        Baseline: 464 kcal
                     </span>
                 </div>
                 
@@ -192,6 +193,28 @@
                         <input type="checkbox" id="activateDefaultToggle" class="sr-only peer">
                         <div class="w-11 h-6 bg-[#4E2424] border border-red-800/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-iosActive"></div>
                     </label>
+                </div>
+
+                <!-- LUNCH NUMBER INPUT -->
+                <div class="flex justify-between items-center py-2 border-b border-red-950/40">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-white">Lunch</label>
+                        <span class="text-xs text-red-300">Custom kcal (+55g protein)</span>
+                    </div>
+                    <div class="w-24">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="lunchInput" placeholder="0" class="w-full bg-[#1A0A0A] text-right text-white p-2.5 rounded-xl font-bold focus:outline-none focus:ring-1 focus:ring-iosActive border border-red-950">
+                    </div>
+                </div>
+
+                <!-- DINNER NUMBER INPUT -->
+                <div class="flex justify-between items-center py-2 border-b border-red-950/40">
+                    <div class="flex flex-col">
+                        <label class="text-lg font-medium text-white">Dinner</label>
+                        <span class="text-xs text-red-300">Custom kcal (+55g protein)</span>
+                    </div>
+                    <div class="w-24">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="dinnerInput" placeholder="0" class="w-full bg-[#1A0A0A] text-right text-white p-2.5 rounded-xl font-bold focus:outline-none focus:ring-1 focus:ring-iosActive border border-red-950">
+                    </div>
                 </div>
 
                 <!-- WHEY SHAKE TOGGLE -->
@@ -278,7 +301,7 @@
                     <!-- Target (Left) -->
                     <div class="flex flex-col justify-center py-1">
                         <div class="text-[10px] text-amber-400/80 font-bold uppercase tracking-wider">Target</div>
-                        <div class="text-lg font-black text-amber-100 mt-0.5">144g</div>
+                        <div class="text-lg font-black text-amber-100 mt-0.5">140g</div>
                     </div>
 
                     <!-- Difference (Middle) -->
@@ -296,7 +319,7 @@
 
                 <!-- WEIGHT-PROTEIN MULTIPLIER SUBCARD -->
                 <div class="bg-[#1C160B]/70 p-3 rounded-2xl text-center border border-amber-950/60">
-                    <div class="text-[10px] text-amber-400/80 font-bold uppercase tracking-wider">Weight-Protein Multiplier (72 kg)</div>
+                    <div class="text-[10px] text-amber-400/80 font-bold uppercase tracking-wider">Weight-Protein Multiplier (70 kg)</div>
                     <div id="proteinMultiplierDisplay" class="text-lg font-extrabold text-amber-200 mt-0.5">1.29x</div>
                 </div>
             </div>
@@ -314,18 +337,20 @@
     </div>
 
     <script>
-        const BASE_INTAKE = 1369; // Every day begins with base intake
+        const BASE_INTAKE = 464; // Every day begins with base intake
         const BASE_BURNT = 1800;  // Every day has at least 1800 burnt
         const KCAL_PER_100_STEPS = 3.5;
         const KCAL_PER_STEP = KCAL_PER_100_STEPS / 100; // = 0.035
 
-        const BASE_PROTEIN = 91.5;
-        const TARGET_PROTEIN = 144;
+        const BASE_PROTEIN = 29;
+        const TARGET_PROTEIN = 140;
 
         // Inputs & interactives DOM elements mapping
         const els = {
             date: document.getElementById('currentDate'),
             activateDefault: document.getElementById('activateDefaultToggle'),
+            lunch: document.getElementById('lunchInput'),
+            dinner: document.getElementById('dinnerInput'),
             whey: document.getElementById('wheyToggle'),
             casein: document.getElementById('caseinToggle'),
             eggDec: document.getElementById('eggDecBtn'),
@@ -358,6 +383,8 @@
             try {
                 const state = {
                     activateDefault: els.activateDefault.checked,
+                    lunch: els.lunch.value,
+                    dinner: els.dinner.value,
                     whey: els.whey.checked,
                     casein: els.casein.checked,
                     eggs: els.eggVal.value,
@@ -380,6 +407,8 @@
                 if (saved) {
                     const state = JSON.parse(saved);
                     els.activateDefault.checked = !!state.activateDefault;
+                    els.lunch.value = state.lunch !== undefined ? state.lunch : "";
+                    els.dinner.value = state.dinner !== undefined ? state.dinner : "";
                     els.whey.checked = !!state.whey;
                     els.casein.checked = !!state.casein;
                     els.eggVal.value = state.eggs !== undefined ? state.eggs : "";
@@ -399,6 +428,8 @@
 
         function calculate() {
             // Retrieve input values
+            const lunchVal = parseInt(els.lunch.value) || 0;
+            const dinnerVal = parseInt(els.dinner.value) || 0;
             const wheyVal = els.whey.checked ? 206 : 0;
             const caseinVal = els.casein.checked ? 120 : 0;
             const eggsCount = parseInt(els.eggVal.value) || 0;
@@ -408,8 +439,8 @@
             const extraCaloriesVal = parseInt(els.extraCalories.value) || 0;
             const customStepOffset = parseInt(els.customStepVal.value) || 0;
 
-            // Total Intake including Extra Calories
-            const totalIntake = BASE_INTAKE + wheyVal + caseinVal + eggVal + fruitsVal + cappuccinoVal + extraCaloriesVal;
+            // Total Intake including Lunch, Dinner, and Extra Calories
+            const totalIntake = BASE_INTAKE + lunchVal + dinnerVal + wheyVal + caseinVal + eggVal + fruitsVal + cappuccinoVal + extraCaloriesVal;
 
             // Total Expenditure (Baseline 1800 + Sport)
             const sportBurn = parseFloat(els.sport.value) || 0;
@@ -451,20 +482,22 @@
                 totalStepDisplays[index].innerText = combinedTotal > 0 ? combinedTotal.toLocaleString() : "0";
             });
 
-            // Protein logic calculations
+            // Protein logic calculations (Automatic +55g protein per entered meal)
+            const lunchProtein = (parseInt(els.lunch.value) || 0) > 0 ? 55 : 0;
+            const dinnerProtein = (parseInt(els.dinner.value) || 0) > 0 ? 55 : 0;
             const wheyProtein = els.whey.checked ? 30 : 0;
             const caseinProtein = els.casein.checked ? 24 : 0;
             const eggProtein = eggsCount * 6;
             const fruitsProtein = els.fruits.checked ? 1 : 0;
             const cappuccinoProtein = els.cappuccino.checked ? 6 : 0;
 
-            const totalProtein = BASE_PROTEIN + wheyProtein + caseinProtein + eggProtein + fruitsProtein + cappuccinoProtein;
+            const totalProtein = BASE_PROTEIN + lunchProtein + dinnerProtein + wheyProtein + caseinProtein + eggProtein + fruitsProtein + cappuccinoProtein;
             const proteinDiffVal = totalProtein - TARGET_PROTEIN;
 
             els.proteinTotal.innerText = totalProtein + "g";
 
-            // Weight-protein multiplier calculation (total value divided by 72, 2 decimals)
-            const multiplier = (totalProtein / 72).toFixed(2);
+            // Weight-protein multiplier calculation (total value divided by 70, 2 decimals)
+            const multiplier = (totalProtein / 70).toFixed(2);
             els.proteinMultiplier.innerText = multiplier + "x";
 
             if (proteinDiffVal >= 0) {
@@ -525,16 +558,30 @@
             calculate();
         });
 
-        // Listen for all change event fields to dynamically fire calculations
-        const inputs = [els.activateDefault, els.whey, els.casein, els.fruits, els.cappuccino, els.extraCalories, els.sport, els.customStepVal];
+        // Listen for all input/change events across all input fields
+        const inputs = [
+            els.activateDefault, 
+            els.lunch, 
+            els.dinner, 
+            els.whey, 
+            els.casein, 
+            els.fruits, 
+            els.cappuccino, 
+            els.extraCalories, 
+            els.sport, 
+            els.customStepVal
+        ];
+        
         inputs.forEach(input => {
             input.addEventListener('input', calculate);
             input.addEventListener('change', calculate);
         });
 
-        // Reset functionality
+        // Reset Form functionality
         els.reset.addEventListener('click', () => {
             els.activateDefault.checked = false;
+            els.lunch.value = "";
+            els.dinner.value = "";
             els.whey.checked = false;
             els.casein.checked = false;
             els.eggVal.value = "";
@@ -544,29 +591,11 @@
             els.sport.value = "";
             els.customStepVal.value = "3000";
             calculate();
-
-            // Clear standard local storage state
-            try {
-                localStorage.removeItem('stepAgent_savedState');
-            } catch (e) {
-                console.warn("Unable to clear local storage", e);
-            }
-
-            // Provide user feedback on button interaction
-            els.reset.innerText = "Cleared ✓";
-            els.reset.classList.replace('bg-zinc-700', 'bg-iosActive');
-            els.reset.classList.replace('text-zinc-100', 'text-black');
-            setTimeout(() => {
-                els.reset.innerText = "Reset Form";
-                els.reset.classList.replace('bg-iosActive', 'bg-zinc-700');
-                els.reset.classList.replace('text-black', 'text-zinc-100');
-            }, 1000);
         });
 
-        // Load stored parameters and initiate calculations on program load
+        // Initial application setup
         loadStateFromLocalStorage();
         calculate();
-
     </script>
 </body>
 </html>
